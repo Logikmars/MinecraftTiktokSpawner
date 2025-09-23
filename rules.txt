@@ -1,0 +1,33 @@
+npm i tiktok-live-connector
+
+https://www.npmjs.com/package/rcon-client
+
+node.js
+
+https://hub.spigotmc.org/jenkins/job/BuildTools/
+
+C:\minecraft-spigot
+
+cmd java -jar BuildTools.jar --rev 1.12.2
+
+Это займёт несколько минут.
+
+В результате в папке появятся файлы:
+
+spigot-1.12.2.jar
+
+craftbukkit-1.12.2.jar
+
+C:\minecraft-spigot\server
+
+start.bat{java -Xmx2G -Xms1G -jar spigot-1.12.2.jar nogui
+pause}
+
+eula.tx = eula = true
+
+server.properties{
+    enable-rcon=true
+    rcon.password=мойпароль
+    rcon.port=25575
+    online-mode=false
+}
