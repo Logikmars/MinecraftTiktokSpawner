@@ -1,0 +1,16 @@
+{
+  "name": "spawnblockdonat",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "rcon-client": "^4.2.5",
+    "tiktok-live-connector": "^2.0.7-beta1"
+  }
+}
