@@ -54,7 +54,7 @@ fakeTikTok.on("gift", async (data) => {
         if (giftCounters.Rose >= 100) {
             console.log("💥 Достигнут лимит 100 роз — СПАВНИМ ГИГАНТСКИЙ TNT!");
             // await sendCommand(`execute ${playerName} ~ ~ ~ summon Fireball ~ ~10 ~ {ExplosionPower:20,Motion:[0.0,-1.0,0.0]}`); 
-            // await sendCommand(`bigboom ${playerName}`);
+            await sendCommand(`bigboom ${playerName}`);
             await sendCommand(`say 💣 ГИГАНТСКИЙ TNT ЗА 100 РОЗ!`);
             giftCounters.Rose = 0; // сбрасываем счётчик
         }
