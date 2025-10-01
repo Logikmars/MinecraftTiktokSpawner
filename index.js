@@ -28,7 +28,7 @@ let likeCounter = 0;
 let subCounter = 0;
 
 // 🎥 Подключаемся к TikTok
-const tiktokUsername = "Cryptowooman";
+const tiktokUsername = "cryptowooman";
 const tiktok = new TikTokLiveConnection(tiktokUsername);
 
 // 🔌 Запуск соединения
@@ -37,33 +37,71 @@ tiktok.connect()
     .catch(err => console.error("❌ Ошибка подключения:", err));
 
 // 🎁 Обработка подарков
-tiktok.on("gift", async (data) => {
-    console.log(`⚡ ${data.uniqueId} отправил ${data.giftName} x${data.repeatCount}`);
+// tiktok.on("gift", async (data) => {
+//     const user = data.user?.uniqueId || "Unknown";
+//     const gift = data.giftName || data.gift?.giftName || "Unknown";
+//     const repeat = data.repeatCount || data.gift?.repeatCount || 1;
 
-    const rule = donations[data.giftName];
+//     console.log(`⚡ ${user} отправил ${gift} x${repeat}`);
+
+//     const rule = donations[gift];
+//     if (rule) {
+//         let commands = [];
+
+//         if (Array.isArray(rule)) {
+//             commands = rule;
+//         } else if (typeof rule === "function") {
+//             commands = rule(repeat);
+//         }
+
+//         for (let cmd of commands) {
+//             await sendCommand(`execute ${playerName} ~ ~ ~ ${cmd}`);
+//         }
+//     } else {
+//         console.log("Нет правил для подарка:", gift);
+//     }
+// });
+
+// tiktok.on("gift", (data) => {
+//     console.log("=== GIFT EVENT ===");
+//     console.dir(data, { depth: null });
+// });
+tiktok.on("gift", async (data) => {
+    if (!data.repeatEnd) return; // только один раз на комбинацию
+
+    const user = data.user?.uniqueId || "Unknown";
+    const gift = data.giftDetails?.giftName || "Unknown";
+    const repeat = data.repeatEnd || 1;
+
+    console.log(`⚡ ${user} отправил ${gift} x${repeat}`);
+
+    const rule = donations[gift];
     if (rule) {
         let commands = [];
 
-        if (Array.isArray(rule)) {
+        if (typeof rule === "function") {
+            commands = rule(repeat);
+        } else if (Array.isArray(rule)) {
             commands = rule;
-        } else if (typeof rule === "function") {
-            commands = rule(data.repeatCount);
         }
 
         for (let cmd of commands) {
             await sendCommand(`execute ${playerName} ~ ~ ~ ${cmd}`);
         }
     } else {
-        console.log("Нет правил для подарка:", data.giftName);
+        console.log("Нет правил для подарка:", gift);
     }
 });
+
+
 
 // ❤️ Обработка лайков
 tiktok.on("like", async (data) => {
     likeCounter += data.likeCount;
-    console.log(`❤️ Лайки от ${data.uniqueId}: +${data.likeCount}, всего: ${likeCounter}`);
+    console.log(`❤️ Лайки от ${data.user?.uniqueId}: +${data.likeCount}, всего: ${likeCounter}`);
 
-    if (likeCounter >= 10000) {
+    // ТАСК потом увеличить до 10к
+    if (likeCounter >= 100) {
         console.log("🔥 Достигнуто 10k лайков — СПАВНИМ TNT!");
         await sendCommand(`execute ${playerName} ~ ~ ~ summon tnt ~ ~5 ~ {Fuse:40}`);
         await sendCommand(`say ❤️ TNT за 10.000 лайков!`);
@@ -74,8 +112,8 @@ tiktok.on("like", async (data) => {
 // ✨ Обработка подписок
 tiktok.on("subscribe", async (data) => {
     subCounter += 1;
-    console.log(`✨ ${data.uniqueId} подписался! Всего подписок: ${subCounter}`);
+    console.log(`✨ ${data.user?.uniqueId} подписался! Всего подписок: ${subCounter}`);
 
     await sendCommand(`execute ${playerName} ~ ~ ~ summon tnt ~ ~5 ~ {Fuse:40}`);
-    await sendCommand(`say ✨ TNT за підписку ${data.uniqueId}!`);
+    await sendCommand(`say ✨ TNT за підписку ${data.user?.uniqueId}!`);
 });
