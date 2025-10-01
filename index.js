@@ -1,4 +1,4 @@
-import TikTokLiveConnection from "tiktok-live-connector";
+import { TikTokLiveConnection } from "tiktok-live-connector";
 import donations from "./donation.js";
 import { Rcon } from "rcon-client";
 
@@ -28,7 +28,7 @@ let likeCounter = 0;
 let subCounter = 0;
 
 // 🎥 Подключаемся к TikTok
-const tiktokUsername = "Cryptowooman"; // твой ник
+const tiktokUsername = "Cryptowooman";
 const tiktok = new TikTokLiveConnection(tiktokUsername);
 
 // 🔌 Запуск соединения
