@@ -24,13 +24,11 @@ async function sendCommand(cmd) {
     }
 }
 
-// 📊 Счётчики донатов
-const giftCounters = {
-    "Rose": 0
-};
+let likeCounter = 0;
+let subCounter = 0;
 
 // 🎥 Подключаемся к TikTok
-const tiktokUsername = "Cryptowooman"; // замени на свой ник
+const tiktokUsername = "Cryptowooman"; // твой ник
 const tiktok = new TikTokLiveConnection(tiktokUsername);
 
 // 🔌 Запуск соединения
@@ -38,31 +36,46 @@ tiktok.connect()
     .then(() => console.log("✅ Подключено к TikTok Live"))
     .catch(err => console.error("❌ Ошибка подключения:", err));
 
-// 🎁 Обработка реальных донатов
+// 🎁 Обработка подарков
 tiktok.on("gift", async (data) => {
     console.log(`⚡ ${data.uniqueId} отправил ${data.giftName} x${data.repeatCount}`);
 
-    const commands = donations[data.giftName];
-    if (commands) {
-        for (let i = 0; i < data.repeatCount; i++) {
-            for (let cmd of commands) {
-                await sendCommand(`execute ${playerName} ~ ~ ~ ${cmd}`);
-            }
+    const rule = donations[data.giftName];
+    if (rule) {
+        let commands = [];
+
+        if (Array.isArray(rule)) {
+            commands = rule;
+        } else if (typeof rule === "function") {
+            commands = rule(data.repeatCount);
+        }
+
+        for (let cmd of commands) {
+            await sendCommand(`execute ${playerName} ~ ~ ~ ${cmd}`);
         }
     } else {
         console.log("Нет правил для подарка:", data.giftName);
     }
+});
 
-    // ✅ Логика для Rose
-    if (data.giftName === "Rose") {
-        giftCounters.Rose += data.repeatCount;
-        console.log(`🌹 Всего роз: ${giftCounters.Rose}`);
+// ❤️ Обработка лайков
+tiktok.on("like", async (data) => {
+    likeCounter += data.likeCount;
+    console.log(`❤️ Лайки от ${data.uniqueId}: +${data.likeCount}, всего: ${likeCounter}`);
 
-        if (giftCounters.Rose >= 100) {
-            console.log("💥 Достигнут лимит 100 роз — СПАВНИМ ГИГАНТСКИЙ TNT!");
-            await sendCommand(`bigboom ${playerName}`);
-            await sendCommand(`say 💣 ГИГАНТСКИЙ TNT ЗА 100 РОЗ!`);
-            giftCounters.Rose = 0; // сброс счётчика
-        }
+    if (likeCounter >= 10000) {
+        console.log("🔥 Достигнуто 10k лайков — СПАВНИМ TNT!");
+        await sendCommand(`execute ${playerName} ~ ~ ~ summon tnt ~ ~5 ~ {Fuse:40}`);
+        await sendCommand(`say ❤️ TNT за 10.000 лайков!`);
+        likeCounter = 0;
     }
+});
+
+// ✨ Обработка подписок
+tiktok.on("subscribe", async (data) => {
+    subCounter += 1;
+    console.log(`✨ ${data.uniqueId} подписался! Всего подписок: ${subCounter}`);
+
+    await sendCommand(`execute ${playerName} ~ ~ ~ summon tnt ~ ~5 ~ {Fuse:40}`);
+    await sendCommand(`say ✨ TNT за підписку ${data.uniqueId}!`);
 });
